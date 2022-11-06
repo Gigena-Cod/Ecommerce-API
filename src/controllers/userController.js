@@ -1,8 +1,8 @@
 import userService from "../services/userService.js";
 
-const getAllUsers = (req, res) => {
-  const allUsers = userService.getAllUsers();
-  res.send("<h1>ALL USERS</h1>");
+const getAllUsers = async (req, res) => {
+  const allUsers = await userService.getAllUsers();
+  res.send(allUsers);
 };
 
 const getOneUser = (req, res) => {

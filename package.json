@@ -2,7 +2,7 @@
   "name": "api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./src/index.js",
   "type": "module",
   "scripts": {
     "start": "node ./src/index.js",
@@ -12,10 +12,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "2.0.20"
   },
   "dependencies": {
     "cors": "2.8.5",
-    "express": "^4.18.2"
+    "express": "4.18.2",
+    "mongoose": "6.7.1"
   }
 }
