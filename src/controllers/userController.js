@@ -1,13 +1,36 @@
 import userService from "../services/userService.js";
 
 const getAllUsers = async (req, res) => {
-  const allUsers = await userService.getAllUsers();
-  res.send(allUsers);
+  try {
+    const allUsers = await userService.getAllUsers();        
+    res.status(200).send({ status: "OK", data: allUsers });
+  } catch (error) {
+    res
+      .status(error?.status || 500)
+      .send({ status: "FAILED", data: { error: error?.data || error } });
+  }
 };
 
 const getOneUser = async (req, res) => {
-  const oneUsers = await userService.getOneUser(req.params.userId);
-  res.send({ status: "OK", data: oneUsers });
+  const { userId } = req.params;
+
+  if (!userId) {
+    return res.status(400).send({
+      status: "FAILED",
+      data: {
+        error: "Key ID is missing or is empty in request params",
+      },
+    });
+  }
+
+  try {
+    const oneUsers = await userService.getOneUser(userId);
+    res.send({ status: "OK", data: oneUsers });
+  } catch (error) {
+    res
+      .status(error?.status || 500)
+      .send({ status: "FAILED", data: { error: error?.data || error } });
+  }
 };
 
 const createNewUser = async (req, res) => {
@@ -53,9 +76,24 @@ const updateOneUser = (req, res) => {
   res.send(`<h1>Update User ${req.params.userId}</h1>`);
 };
 
-const deleteOneUser = (req, res) => {
-  userService.deleteOneUser();
-  res.send(`<h1>Delete User ${req.params.userId}</h1>`);
+const deleteOneUser = async (req, res) => {
+  const { userId } = req.params;
+
+  if (!userId)
+    return res.status(400).send({
+      status: "FAILED",
+      data: {
+        error: "Key is missing or is empty in request params",
+      },
+    });
+  try {
+    const deletedUser = await userService.deleteOneUser(userId);
+    res.status(201).send({ status: "OK", data: deletedUser });
+  } catch (error) {
+    res
+      .status(error?.status || 500)
+      .send({ status: "FAILED", data: { error: error?.data || error } });
+  }
 };
 
 export default {

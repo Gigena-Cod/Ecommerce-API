@@ -7,7 +7,7 @@ v1UserRouter
     .get('/',userControllers.getAllUsers)
     .get('/:userId',userControllers.getOneUser)
     .post('/',userControllers.createNewUser)
-    .patch('/',userControllers.updateOneUser)
-    .delete('/',userControllers.deleteOneUser)
+    .patch('/:userId',userControllers.updateOneUser)
+    .delete('/:userId',userControllers.deleteOneUser)
 
 export default v1UserRouter
