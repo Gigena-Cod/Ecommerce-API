@@ -1,10 +1,8 @@
 import mongoose from "mongoose";
-const database = {
-  name: "database",
-  password: "1478963",
-};
+import * as dotenv from 'dotenv'
 
-const conectiongString = `mongodb+srv://Destroxides:${database.password}@cluster0.wjyc1.mongodb.net/${database.name}?retryWrites=true&w=majority`;
+dotenv.config()
+const conectiongString = process.env.MONGO_DB_URI
 
 const initialConnect = async () => {
   mongoose.connect(conectiongString,)
