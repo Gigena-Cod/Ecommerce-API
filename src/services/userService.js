@@ -52,7 +52,26 @@ const createNewUser = async (data) => {
   }
 };
 
-const updateOneUser = () => {
+const updateOneUser = async (id,data) => {
+  const userExist = await User.findById(id);
+  
+  if (!userExist)
+  throw {
+    status: 400,
+    data: `User with the id ${id} not exist`,
+  };
+  
+  try {
+    const userExist = await User.findByIdAndUpdate({_id:id},data,{new: true});
+    console.log("🚀 ~ file: userService.js ~ line 57 ~ updateOneUser ~ userExist", userExist)
+    
+  } catch (error) {
+    throw {
+      status: 500,
+      message: error?.data || message,
+    };
+  }
+ 
   return;
 };
 

@@ -2,7 +2,7 @@ import userService from "../services/userService.js";
 
 const getAllUsers = async (req, res) => {
   try {
-    const allUsers = await userService.getAllUsers();        
+    const allUsers = await userService.getAllUsers();
     res.status(200).send({ status: "OK", data: allUsers });
   } catch (error) {
     res
@@ -71,9 +71,31 @@ const createNewUser = async (req, res) => {
   }
 };
 
-const updateOneUser = (req, res) => {
-  const updatedUser = userService.updateOneUser();
-  res.send(`<h1>Update User ${req.params.userId}</h1>`);
+const updateOneUser = async (req, res) => {
+  const {
+    body,
+    params: { userId },
+  } = req;
+
+  const condition =  !body?.name && !body?.username && !body?.email && !body?.password && typeof body?.isAdmin !== "boolean";
+  if (condition) {
+    return res.status(400).send({
+      status: "FAILED",
+      data: {
+        error:
+          "One of following key is missing or is empty in request: 'id','body'",
+      },
+    });
+  }
+
+  try {
+    const updatedUser = await userService.updateOneUser(userId, body);
+    res.status(201).send({ status: "OK", data: updatedUser });
+  } catch (error) {
+    res
+      .status(error?.status || 500)
+      .send({ status: "FAILED", data: { error: error?.data || error } });
+  }
 };
 
 const deleteOneUser = async (req, res) => {
