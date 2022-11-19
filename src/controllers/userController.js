@@ -1,8 +1,9 @@
 import userService from "../services/userService.js";
 
 const getAllUsers = async (req, res) => {
+  const { token } = req.headers;
   try {
-    const allUsers = await userService.getAllUsers();
+    const allUsers = await userService.getAllUsers(token);
     res.status(200).send({ status: "OK", data: allUsers });
   } catch (error) {
     res
@@ -13,6 +14,7 @@ const getAllUsers = async (req, res) => {
 
 const getOneUser = async (req, res) => {
   const { userId } = req.params;
+  const { token } = req.headers;
 
   if (!userId) {
     return res.status(400).send({
@@ -24,7 +26,7 @@ const getOneUser = async (req, res) => {
   }
 
   try {
-    const oneUsers = await userService.getOneUser(userId);
+    const oneUsers = await userService.getOneUser(userId,token);
     res.send({ status: "OK", data: oneUsers });
   } catch (error) {
     res
@@ -74,10 +76,16 @@ const createNewUser = async (req, res) => {
 const updateOneUser = async (req, res) => {
   const {
     body,
-    params: { userId },
+    headers:{token}
   } = req;
+  
 
-  const condition =  !body?.name && !body?.username && !body?.email && !body?.password && typeof body?.isAdmin !== "boolean";
+  const condition =
+    !body?.name &&
+    !body?.username &&
+    !body?.email &&
+    !body?.password &&
+    typeof body?.isAdmin !== "boolean";
   if (condition) {
     return res.status(400).send({
       status: "FAILED",
@@ -89,7 +97,7 @@ const updateOneUser = async (req, res) => {
   }
 
   try {
-    const updatedUser = await userService.updateOneUser(userId, body);
+    const updatedUser = await userService.updateOneUser(body,token);
     res.status(201).send({ status: "OK", data: updatedUser });
   } catch (error) {
     res
@@ -99,17 +107,9 @@ const updateOneUser = async (req, res) => {
 };
 
 const deleteOneUser = async (req, res) => {
-  const { userId } = req.params;
-
-  if (!userId)
-    return res.status(400).send({
-      status: "FAILED",
-      data: {
-        error: "Key is missing or is empty in request params",
-      },
-    });
+  const {token} = req.headers; 
   try {
-    const deletedUser = await userService.deleteOneUser(userId);
+    const deletedUser = await userService.deleteOneUser(token);
     res.status(201).send({ status: "OK", data: deletedUser });
   } catch (error) {
     res

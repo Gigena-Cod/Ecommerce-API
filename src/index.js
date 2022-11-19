@@ -3,6 +3,7 @@ import cors from "cors";
 import initialConnect from './database/mongo.js'
 import middlewares from "./middlewares/index.js";
 import v1UserRouter from "./v1/routes/userRoutes.js";
+import v1AuthRouter from "./v1/routes/authRoutes.js";
 
 
 initialConnect()
@@ -12,6 +13,7 @@ app.use(express.json());
 const PORT = process.env.PORT;
 
 app.use("/api/v1/users", v1UserRouter);
+app.use("/api/v1/signin", v1AuthRouter);
 app.use(cors());
 
 app.listen(PORT, () => {

@@ -1,6 +1,6 @@
 import {model, Schema } from "mongoose";
-
-const userSchema = new Schema({    
+import  bcrypt from 'bcrypt'
+const  userSchema = new Schema({    
     name:String,
     username:String,
     email:String,
@@ -17,6 +17,17 @@ userSchema.set('toJSON',{
         delete returnedObject.__v
     }
 })
+
+userSchema.methods.encryptPassword = async ( password)=>{   
+
+    const salt = await bcrypt.genSalt(10)
+    return bcrypt.hash(password,salt)
+}
+
+userSchema.methods.validatePassword = function(password){   
+return bcrypt.compare(password,this.password)
+}
+
 const User = model( 'User',userSchema)
 
 export default User

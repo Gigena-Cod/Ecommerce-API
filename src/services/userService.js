@@ -1,15 +1,64 @@
-import mongoose from "mongoose";
 import User from "../models/UserModel.js";
+import jwt from "jsonwebtoken";
 
-const getAllUsers = async () => {
+/*
+OBTENER TODOS LOS USUARIOS
+  PERMISOS
+    -> TOKEN
+    -> SUPERADMIN
+*/
+const getAllUsers = async (token) => {
+  // VALIDAMOS QUE EXISTA EL TOKEN
+  if (!token)
+    throw {
+      status: 400,
+      data: `No token provider`,
+    };
+
+  // VALIDAMOS PERMISOS - DEBE SER SUPER ADMIN PARA RELIZAR DICHA PETICION
+  const decode = jwt.verify(token, process.env.SECRET_KEY);
+  const userExist = await User.findById(decode.id);
+
+  if (!userExist.isSuperAdmin)
+    throw {
+      status: 400,
+      data: `Unauthorized user`,
+    };
+
+  // SI ES SUPER ADMIN
   const allUsers = await User.find();
   return allUsers;
 };
 
-const getOneUser = async (id) => {
+/*
+OBTENER UN USUARIO POR ID
+  PERMISOS
+    -> TOKEN
+    -> SUPERADMIN
+*/
+const getOneUser = async (id, token) => {
+  // VALIDAMOS QUE EXISTA EL TOKEN
+  if (!token)
+    throw {
+      status: 400,
+      data: `No token provider`,
+    };
+
+  // VALIDAMOS PERMISOS - DEBE SER SUPER ADMIN PARA RELIZAR DICHA PETICION
+  const decode = jwt.verify(token, process.env.SECRET_KEY);
+  const userExist = await User.findById(decode.id);
+
+  if (!userExist.isSuperAdmin)
+    throw {
+      status: 400,
+      data: `Unauthorized user`,
+    };
+
+  // BUSCAMOS USUARIO POR ID
   try {
     const oneUsers = await User.findById(id);
 
+    //  SI EL USUARIO NO EXISTE
     if (!oneUsers)
       throw {
         status: 400,
@@ -25,7 +74,11 @@ const getOneUser = async (id) => {
   }
 };
 
+/*
+CREAR UN NUEVO USUARIO
+*/
 const createNewUser = async (data) => {
+  // VALIDAMOS SI EL USERNAME ESTA REGISTRADO
   const userExistUsername = await User.findOne({ username: data.username });
   if (userExistUsername)
     throw {
@@ -33,6 +86,7 @@ const createNewUser = async (data) => {
       data: `User with the username ${data.username} already exist`,
     };
 
+  // VALIDAMOS SI EL EMAIL ESTA REGISTRADO
   const userExistEmail = await User.findOne({ email: data.email });
   if (userExistEmail)
     throw {
@@ -42,8 +96,17 @@ const createNewUser = async (data) => {
 
   try {
     const newUser = new User(data);
-    newUser.save();
-    return `User ${data.username} successfully created`;
+
+    // ENCRIPTAMOS PASSWORD
+    newUser.password = await newUser.encryptPassword(newUser.password);
+    await newUser.save();
+
+    // GENERAMOS TOKEN
+    const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, {
+      expiresIn: 60 * 60 ,
+    });
+
+    return token;
   } catch (error) {
     throw {
       status: 500,
@@ -52,42 +115,51 @@ const createNewUser = async (data) => {
   }
 };
 
-const updateOneUser = async (id,data) => {
-  const userExist = await User.findById(id);
-  
-  if (!userExist)
-  throw {
-    status: 400,
-    data: `User with the id ${id} not exist`,
-  };
-  
-  try {
-    const userExist = await User.findByIdAndUpdate({_id:id},data,{new: true});
-    console.log("🚀 ~ file: userService.js ~ line 57 ~ updateOneUser ~ userExist", userExist)
-    
-  } catch (error) {
-    throw {
-      status: 500,
-      message: error?.data || message,
-    };
-  }
- 
-  return;
-};
-
-const deleteOneUser = async (id) => {
-  const userExist = await User.findById(id);
-  
-  if (!userExist)
+/*
+ACTUALIZAR UN USUARIO
+  PERMISOS
+    -> TOKEN
+  DATA
+*/
+const updateOneUser = async (data, token) => {
+  // VALIDAMOS QUE EXISTA EL TOKEN
+  if (!token)
     throw {
       status: 400,
-      data: `User with the id ${id} not exist`,
+      data: `No token provider`,
     };
-    
+
+  // OBTENEMOS USUARIO PARA ACTUALIZAR
+  const decode = jwt.verify(token, process.env.SECRET_KEY);
+
   try {
-    User.findByIdAndRemove(id).exec();
-    return `User ${id} successfully deleted`;
-    
+    await User.findByIdAndUpdate({ _id: decode.id }, data, {
+      new: true,
+    });
+
+    return `User ${decode.id} successfully updated`;
+  } catch (error) {
+    throw {
+      status: 500,
+      message: error?.data || message,
+    };
+  }
+};
+
+const deleteOneUser = async (token) => {
+  // VALIDAMOS QUE EXISTA EL TOKEN
+  if (!token)
+    throw {
+      status: 400,
+      data: `No token provider`,
+    };
+
+  // OBTENEMOS USUARIO PARA ELIMINAR
+  const decode = jwt.verify(token, process.env.SECRET_KEY);
+
+  try {
+    User.findByIdAndRemove(decode.id).exec();
+    return `User ${decode.id} successfully deleted`;
   } catch (error) {
     throw {
       status: 500,
