@@ -1,58 +1,25 @@
 import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
 
-/*
-OBTENER TODOS LOS USUARIOS
-  PERMISOS
-    -> TOKEN
-    -> SUPERADMIN
-*/
-const getAllUsers = async (token) => {
-  // VALIDAMOS QUE EXISTA EL TOKEN
-  if (!token)
-    throw {
-      status: 400,
-      data: `No token provider`,
-    };
 
-  // VALIDAMOS PERMISOS - DEBE SER SUPER ADMIN PARA RELIZAR DICHA PETICION
+const getAllUsers = async (token) => {
   const decode = jwt.verify(token, process.env.SECRET_KEY);
   const userExist = await User.findById(decode.id);
 
-  if (!userExist.isSuperAdmin)
-    throw {
-      status: 400,
-      data: `Unauthorized user`,
-    };
+  // VALIDAMOS PERMISOS - DEBE SER SUPER ADMIN PARA RELIZAR DICHA PETICION
+  validateIsSuperAdmin(userExist);
 
   // SI ES SUPER ADMIN
   const allUsers = await User.find();
   return allUsers;
 };
 
-/*
-OBTENER UN USUARIO POR ID
-  PERMISOS
-    -> TOKEN
-    -> SUPERADMIN
-*/
 const getOneUser = async (id, token) => {
-  // VALIDAMOS QUE EXISTA EL TOKEN
-  if (!token)
-    throw {
-      status: 400,
-      data: `No token provider`,
-    };
-
-  // VALIDAMOS PERMISOS - DEBE SER SUPER ADMIN PARA RELIZAR DICHA PETICION
   const decode = jwt.verify(token, process.env.SECRET_KEY);
   const userExist = await User.findById(decode.id);
 
-  if (!userExist.isSuperAdmin)
-    throw {
-      status: 400,
-      data: `Unauthorized user`,
-    };
+  // VALIDAMOS PERMISOS - DEBE SER SUPER ADMIN PARA RELIZAR DICHA PETICION
+  validateIsSuperAdmin(userExist);
 
   // BUSCAMOS USUARIO POR ID
   try {
@@ -74,10 +41,9 @@ const getOneUser = async (id, token) => {
   }
 };
 
-/*
-CREAR UN NUEVO USUARIO
-*/
+
 const createNewUser = async (data) => {
+
   // VALIDAMOS SI EL USERNAME ESTA REGISTRADO
   const userExistUsername = await User.findOne({ username: data.username });
   if (userExistUsername)
@@ -103,7 +69,7 @@ const createNewUser = async (data) => {
 
     // GENERAMOS TOKEN
     const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, {
-      expiresIn: 60 * 60 ,
+      expiresIn: 60 * 60,
     });
 
     return token;
@@ -115,19 +81,8 @@ const createNewUser = async (data) => {
   }
 };
 
-/*
-ACTUALIZAR UN USUARIO
-  PERMISOS
-    -> TOKEN
-  DATA
-*/
+
 const updateOneUser = async (data, token) => {
-  // VALIDAMOS QUE EXISTA EL TOKEN
-  if (!token)
-    throw {
-      status: 400,
-      data: `No token provider`,
-    };
 
   // OBTENEMOS USUARIO PARA ACTUALIZAR
   const decode = jwt.verify(token, process.env.SECRET_KEY);
@@ -147,13 +102,7 @@ const updateOneUser = async (data, token) => {
 };
 
 const deleteOneUser = async (token) => {
-  // VALIDAMOS QUE EXISTA EL TOKEN
-  if (!token)
-    throw {
-      status: 400,
-      data: `No token provider`,
-    };
-
+  
   // OBTENEMOS USUARIO PARA ELIMINAR
   const decode = jwt.verify(token, process.env.SECRET_KEY);
 
@@ -166,6 +115,14 @@ const deleteOneUser = async (token) => {
       message: error?.data || message,
     };
   }
+};
+
+const validateIsSuperAdmin = (userExist) => {
+  if (!userExist.isSuperAdmin)
+    throw {
+      status: 400,
+      data: `Unauthorized user`,
+    };
 };
 
 export default {
