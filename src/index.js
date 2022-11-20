@@ -24,11 +24,11 @@ initialConnect()
 const app = express();
 app.use(morgan('tiny'))
 app.use(express.json());
+app.use(cors(corsOpts));
 const PORT = process.env.PORT;
 
 app.use("/api/v1/users", v1UserRouter);
 app.use("/api/v1/sesion", v1AuthRouter);
-app.use(cors(corsOpts));
 
 
 app.listen(PORT, () => {
