@@ -6,6 +6,18 @@ import middlewares from "./middlewares/index.js";
 import v1UserRouter from "./v1/routes/userRoutes.js";
 import v1AuthRouter from "./v1/routes/authRoutes.js";
 
+const corsOpts = {
+  origin: '*',
+
+  methods: [
+    'GET',
+    'POST',
+  ],
+
+  allowedHeaders: [
+    'Content-Type',
+  ],
+};
 
 initialConnect()
 
@@ -16,7 +28,8 @@ const PORT = process.env.PORT;
 
 app.use("/api/v1/users", v1UserRouter);
 app.use("/api/v1/sesion", v1AuthRouter);
-app.use(cors());
+app.use(cors(corsOpts));
+
 
 app.listen(PORT, () => {
   console.log(`Server listening on Port ${PORT}`);
