@@ -8,7 +8,7 @@ const initialConnect = async () => {
   mongoose
     .connect(conectiongString)
     .then(() => console.log("Database connected"))
-    .catch(() => console.log("Database Problem with connected"));
+    .catch((error) => console.log(error, "Database Problem with connected"));
 };
 
 export default initialConnect;
