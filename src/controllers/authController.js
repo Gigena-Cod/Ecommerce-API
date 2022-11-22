@@ -52,6 +52,5 @@ const validateToken = async (req, res, next) => {
 export default {
   signInAuth,
   signOutAuth,
-  validateToken,
-  validate
+  validateToken
 };
