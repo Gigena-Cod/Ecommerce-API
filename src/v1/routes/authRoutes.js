@@ -9,5 +9,7 @@ v1AuthRouter
     .post('/signin',authControllers.signInAuth)
     //LOGOUT
     .post('/signout',controllers.isAuth,authControllers.signOutAuth)
+    //VALIDATE SESION
+    .post('/validate',controllers.isAuth)
 
 export default v1AuthRouter

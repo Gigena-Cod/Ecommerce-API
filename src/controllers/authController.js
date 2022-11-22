@@ -53,4 +53,5 @@ export default {
   signInAuth,
   signOutAuth,
   validateToken,
+  validate
 };

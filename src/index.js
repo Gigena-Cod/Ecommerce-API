@@ -8,7 +8,9 @@ import v1AuthRouter from "./v1/routes/authRoutes.js";
 
 const corsOpts = {
   origin: "*",
-  methods: ["GET", "POST", "DELETE", "PATCH"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 200,
   allowedHeaders: ["Content-Type", "token"],
 };
 
