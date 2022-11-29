@@ -67,12 +67,9 @@ const createNewUser = async (data) => {
     newUser.password = await newUser.encryptPassword(newUser.password);
     await newUser.save();
 
-    // GENERAMOS TOKEN
-    const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, {
-      expiresIn: 60 * 60,
-    });
+    
 
-    return token;
+    return `User ${data.email} successfully created`;
   } catch (error) {
     throw {
       status: 500,
@@ -86,7 +83,10 @@ const updateOneUser = async (data, token) => {
 
   // OBTENEMOS USUARIO PARA ACTUALIZAR
   const decode = jwt.verify(token, process.env.SECRET_KEY);
-
+  if(data.password){
+    data.password=encryptPassword(data.password)
+  }
+  
   try {
     await User.findByIdAndUpdate({ _id: decode.id }, data, {
       new: true,
@@ -125,6 +125,10 @@ const validateIsSuperAdmin = (userExist) => {
     };
 };
 
+const encryptPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+};
 export default {
   getAllUsers,
   getOneUser,

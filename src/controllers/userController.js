@@ -9,6 +9,7 @@ const createNewUser = async (req, res) => {
   // VALIDAMOS DATOS NECESARIOS PARA CREAR USUARIO
   const condition =
     !body.name ||
+    !body.lastname ||
     !body.username ||
     !body.email ||
     !body.password ||
@@ -26,6 +27,7 @@ const createNewUser = async (req, res) => {
 
   const newUser = {
     name: body.name,
+    lastname: body.lastname,
     username: body.username,
     email: body.email,
     password: body.password,
@@ -98,8 +100,7 @@ ACTUALIZAR UN USUARIO
   DATA
 */
 
-const updateOneUser = async (req, res) => {
-  console.trace('updateOneUser');
+const updateOneUser = async (req, res) => { 
   const {
     body,
     headers: { token },
@@ -108,6 +109,7 @@ const updateOneUser = async (req, res) => {
   // VALIDAMOS DATOS NECESARIOS PARA ACTUALIZAR
   const condition =
     !body?.name &&
+    !body?.lastname &&
     !body?.username &&
     !body?.email &&
     !body?.password &&

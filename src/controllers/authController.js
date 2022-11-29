@@ -3,7 +3,7 @@ import authService from "../services/authService.js";
 const signInAuth = async (req, res) => {
   const { email, password } = req.body;
   const condition = !email || !password;
-
+ 
   if (condition) {
     return res.status(400).send({
       status: "FAILED",
