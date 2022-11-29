@@ -2,12 +2,13 @@ import { model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 const userSchema = new Schema({
   name: String,
+  lastname: String,
   username: String,
   email: String,
   password: String,
   isSuperAdmin: Boolean,
   isAdmin: Boolean,
-  tokens: [{ type: Object }],
+  token: String,
 });
 
 userSchema.set("toJSON", {
